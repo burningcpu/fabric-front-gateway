@@ -1,6 +1,7 @@
 package com.webank.fabric.front.sdk;
 
 import com.webank.fabric.front.commons.pojo.sdk.PeerVO;
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.log4j.Log4j2;
 import org.hyperledger.fabric.sdk.exception.InvalidArgumentException;
@@ -16,6 +17,7 @@ import java.util.List;
  */
 @Log4j2
 @RestController
+@Api(value = "/sdk", tags = "about fabric sdk")
 @RequestMapping("sdk")
 public class SdkController {
     @Autowired
