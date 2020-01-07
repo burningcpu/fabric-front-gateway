@@ -1,6 +1,6 @@
 package com.webank.fabric.front.sdk;
 
-import com.webank.fabric.front.sdk.pojo.PeerVO;
+import com.webank.fabric.front.commons.pojo.sdk.PeerVO;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.compress.utils.Lists;
 import org.apache.commons.lang3.StringUtils;

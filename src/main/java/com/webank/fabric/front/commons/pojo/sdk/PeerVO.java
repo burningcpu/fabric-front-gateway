@@ -1,4 +1,4 @@
-package com.webank.fabric.front.sdk.pojo;
+package com.webank.fabric.front.commons.pojo.sdk;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

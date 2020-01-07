@@ -1,4 +1,4 @@
-package com.webank.fabric.front.commons.pojo;
+package com.webank.fabric.front.commons.pojo.properties;
 
 import lombok.Data;
 

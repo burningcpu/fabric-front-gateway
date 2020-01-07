@@ -1,7 +1,7 @@
 package com.webank.fabric.front.commons.config;
 
-import com.webank.fabric.front.commons.pojo.GatewayProperties;
-import com.webank.fabric.front.commons.pojo.NetworkProperties;
+import com.webank.fabric.front.commons.pojo.properties.GatewayProperties;
+import com.webank.fabric.front.commons.pojo.properties.NetworkProperties;
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;

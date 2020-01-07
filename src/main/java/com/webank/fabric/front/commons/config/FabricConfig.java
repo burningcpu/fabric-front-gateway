@@ -1,6 +1,6 @@
 package com.webank.fabric.front.commons.config;
 
-import com.webank.fabric.front.commons.pojo.WalletProperties;
+import com.webank.fabric.front.commons.pojo.properties.WalletProperties;
 import com.webank.fabric.front.commons.utils.GateWayUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.hyperledger.fabric.gateway.Gateway;
