@@ -1,0 +1,22 @@
+#server config
+server:
+   port: 5005
+   servlet:
+      context-path: /Fabric-Front
+
+spring:
+   fabric:
+      channel: mychannel
+      gateway:
+         wallet:
+            identify: "Admin"
+            certFile: "./crypto-config/peerOrganizations/org1.example.com/users/Admin@org1.example.com/msp/signcerts/Admin@org1.example.com-cert.pem"
+            privateKeyFile: "./crypto-config/peerOrganizations/org1.example.com/users/Admin@org1.example.com/msp/keystore/25de627907d35aae2c59b5ee131b4a328212437059029059a3d35a3c16722ffc_sk"
+      network:
+         file: "./network/connection-org1.yaml"
+
+#log config
+logging:
+   config: classpath:log4j2.xml
+   level:
+      com.webank.fabric.front: debug
