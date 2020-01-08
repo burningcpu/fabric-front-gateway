@@ -1,4 +1,4 @@
-package com.webank.fabric.front.commons;
+package com.webank.fabric.front.commons.utils;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
@@ -11,7 +11,7 @@ import java.io.IOException;
 import static java.lang.String.format;
 
 @Slf4j
-public class Utils {
+public class FrontUtils {
 
 
     /**
@@ -39,4 +39,16 @@ public class Utils {
 
         return pemString;
     }
+
+    /**
+     * check ip address.
+     */
+    public static boolean isIP(String address) {
+        if (address.length() < 7 || address.length() > 15 || "".equals(address)) {
+            return false;
+        }
+        String pattern = "([1-9]|[1-9]\\d|1\\d{2}|2[0-4]\\d|25[0-5])(\\.(\\d|[1-9]\\d|1\\d{2}|2[0-4]\\d|25[0-5])){3}";
+        return address.matches(pattern);
+    }
+
 }

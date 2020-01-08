@@ -1,6 +1,7 @@
 package com.webank.fabric.front.sdk;
 
 import com.webank.fabric.front.commons.pojo.sdk.PeerVO;
+import com.webank.fabric.front.commons.utils.FrontUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.compress.utils.Lists;
 import org.apache.commons.lang3.StringUtils;
@@ -13,10 +14,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import java.math.BigInteger;
-import java.util.Collection;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 /**
  * service of fabric sdk.
@@ -42,10 +40,24 @@ public class SdkService {
         Optional<Collection<Peer>> peersOptional = Optional.ofNullable(channel.getPeers());
         if (peersOptional.isPresent()) {
             //foreach peers
-            peersOptional.get().stream().forEach(p -> peers.add(new PeerVO(p)));
+            peersOptional.get().stream().forEach(p -> peers.add(createPeerVO(p)));
         }
         return peers;
+    }
 
+    /**
+     * create object of PeerVO by Peer.
+     */
+    private PeerVO createPeerVO(Peer peer) {
+        String[] protocolDomainPort = peer.getUrl().split(":");
+        String domain = protocolDomainPort[1].substring(2);
+        PeerVO peerVO = PeerVO.builder()
+                .url(peer.getUrl())
+                .ip(FrontUtils.isIP(domain) ? domain : null)
+                .port(Integer.valueOf(protocolDomainPort[2]))
+                .name(peer.getName().split(":")[0])
+                .build();
+        return peerVO;
     }
 
 

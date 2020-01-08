@@ -44,7 +44,7 @@ public class SdkController {
     /**
      * get blockInfo by block number.
      */
-    @ApiOperation(value = "queryBlockByNumber", notes = "get block bu number")
+    @ApiOperation(value = "queryBlockByNumber", notes = "get block by number")
     @GetMapping("/queryBlockByNumber/{blockNumber}")
     public byte[] queryBlockByNumber(@PathVariable(value = "blockNumber") Long blockNumber) throws InvalidArgumentException, ProposalException {
         return sdkService.queryBlockByNumber(blockNumber);
@@ -53,7 +53,7 @@ public class SdkController {
     /**
      * get blockInfo by block hash.
      */
-    @ApiOperation(value = "blockInfo", notes = "get block info")
+    @ApiOperation(value = "queryBlockByHash", notes = "get block by hash")
     @GetMapping("/queryBlockByHash/{blockHash}")
     public byte[] queryBlockByHash(@PathVariable(value = "blockHash") String blockHash) throws InvalidArgumentException, ProposalException {
         return sdkService.queryBlockByHash(blockHash);
