@@ -16,8 +16,8 @@ import org.hyperledger.fabric.sdk.Peer;
 @NoArgsConstructor
 @AllArgsConstructor
 public class PeerVO {
-    private String ip;
-    private Integer port;
-    private String url;
-    private String name;
+    private String peerUrl;
+    private String peerName;
+    private Integer peerPort;
+    private String peerIp;
 }

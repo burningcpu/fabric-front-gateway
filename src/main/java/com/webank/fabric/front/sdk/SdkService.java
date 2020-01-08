@@ -52,10 +52,10 @@ public class SdkService {
         String[] protocolDomainPort = peer.getUrl().split(":");
         String domain = protocolDomainPort[1].substring(2);
         PeerVO peerVO = PeerVO.builder()
-                .url(peer.getUrl())
-                .ip(FrontUtils.isIP(domain) ? domain : null)
-                .port(Integer.valueOf(protocolDomainPort[2]))
-                .name(peer.getName().split(":")[0])
+                .peerUrl(peer.getUrl())
+                .peerIp(FrontUtils.isIP(domain) ? domain : null)
+                .peerPort(Integer.valueOf(protocolDomainPort[2]))
+                .peerName(peer.getName().split(":")[0])
                 .build();
         return peerVO;
     }
@@ -100,23 +100,23 @@ public class SdkService {
     /**
      * get latest block height.
      */
-    public BigInteger getCurrentBlockHeight(String peerAddress) throws InvalidArgumentException, ProposalException {
-        if (StringUtils.isBlank(peerAddress)) {
+    public BigInteger getCurrentBlockHeight(String peerUrl) throws InvalidArgumentException, ProposalException {
+        if (StringUtils.isBlank(peerUrl)) {
             return getChannelBlockHeight();
         }
-        return getPeerBlockHeight(peerAddress);
+        return getPeerBlockHeight(peerUrl);
     }
 
 
     /**
      * get latest block height of peer.
      */
-    public BigInteger getPeerBlockHeight(String peerAddress) throws ProposalException, InvalidArgumentException {
+    public BigInteger getPeerBlockHeight(String peerUrl) throws ProposalException, InvalidArgumentException {
         Optional<Collection<Peer>> peersOptional = Optional.ofNullable(channel.getPeers());
         if (!peersOptional.isPresent())
             return null;
 
-        Peer peer = peersOptional.get().stream().filter(p -> peerAddress.equals(p.getUrl())).findFirst().get();
+        Peer peer = peersOptional.get().stream().filter(p -> peerUrl.equals(p.getUrl())).findFirst().get();
         return getPeerBlockHeight(peer);
     }
 

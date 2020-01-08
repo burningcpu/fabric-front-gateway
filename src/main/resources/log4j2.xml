@@ -52,7 +52,7 @@
     <Root level="info">
       <AppenderRef ref="asyncErrorLog"/>
       <AppenderRef ref="asyncInfo"/>
-      <AppenderRef ref="asyncConsole"/>
+<!--      <AppenderRef ref="asyncConsole"/>-->
     </Root>
   </Loggers>
 </Configuration>

@@ -64,8 +64,8 @@ public class SdkController {
      */
     @ApiOperation(value = "currentBlockHeight", notes = "get latest block height")
     @GetMapping("currentBlockHeight")
-    public BigInteger getCurrentBlockHeight(@RequestParam(name = "peerAddress", required = false) String peerAddress) throws InvalidArgumentException, ProposalException {
-        return sdkService.getCurrentBlockHeight(peerAddress);
+    public BigInteger getCurrentBlockHeight(@RequestParam(name = "peerUrl", required = false) String peerUrl) throws InvalidArgumentException, ProposalException {
+        return sdkService.getCurrentBlockHeight(peerUrl);
     }
 
     /**
