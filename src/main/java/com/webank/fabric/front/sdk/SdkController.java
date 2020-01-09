@@ -60,13 +60,23 @@ public class SdkController {
     }
 
     /**
-     * get latest block height.
+     * get latest block height of peer.
      */
-    @ApiOperation(value = "currentBlockHeight", notes = "get latest block height")
-    @GetMapping("currentBlockHeight")
-    public BigInteger getCurrentBlockHeight(@RequestParam(name = "peerUrl", required = false) String peerUrl) throws InvalidArgumentException, ProposalException {
-        return sdkService.getCurrentBlockHeight(peerUrl);
+    @ApiOperation(value = "getPeerBlockNumber", notes = "get latest block height")
+    @GetMapping("peerBlockNumber")
+    public BigInteger getPeerBlockNumber(@RequestParam(value = "peerUrl") String peerUrl) throws InvalidArgumentException, ProposalException {
+        return sdkService.getPeerBlockNumber(peerUrl);
     }
+
+    /**
+     * get latest block height of channel.
+     */
+    @ApiOperation(value = "getChannelBlockNumber", notes = "get latest block height of channel")
+    @GetMapping("channelBlockNumber")
+    public BigInteger getChannelBlockNumber() throws InvalidArgumentException, ProposalException {
+        return sdkService.getChannelBlockNumber();
+    }
+
 
     /**
      * get current channel.

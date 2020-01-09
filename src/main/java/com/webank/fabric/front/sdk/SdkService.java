@@ -98,20 +98,9 @@ public class SdkService {
 
 
     /**
-     * get latest block height.
-     */
-    public BigInteger getCurrentBlockHeight(String peerUrl) throws InvalidArgumentException, ProposalException {
-        if (StringUtils.isBlank(peerUrl)) {
-            return getChannelBlockHeight();
-        }
-        return getPeerBlockHeight(peerUrl);
-    }
-
-
-    /**
      * get latest block height of peer.
      */
-    public BigInteger getPeerBlockHeight(String peerUrl) throws ProposalException, InvalidArgumentException {
+    public BigInteger getPeerBlockNumber(String peerUrl) throws ProposalException, InvalidArgumentException {
         Optional<Collection<Peer>> peersOptional = Optional.ofNullable(channel.getPeers());
         if (!peersOptional.isPresent())
             return null;
@@ -121,9 +110,9 @@ public class SdkService {
     }
 
     /**
-     * get latest block height of channel.
+     * get latest block number of channel.
      */
-    public BigInteger getChannelBlockHeight() throws ProposalException, InvalidArgumentException {
+    public BigInteger getChannelBlockNumber() throws ProposalException, InvalidArgumentException {
         Optional<BlockchainInfo> blockChainInfoOptional = Optional.ofNullable(channel.queryBlockchainInfo());
         if (!blockChainInfoOptional.isPresent())
             return null;
