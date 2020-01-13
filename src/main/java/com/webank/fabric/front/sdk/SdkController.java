@@ -42,6 +42,17 @@ public class SdkController {
     }
 
     /**
+     * get blockInfo by txId.
+     */
+    @ApiOperation(value = "getBlockByTxId", notes = "get block info by txId")
+    @GetMapping("/blockInfo/{txId}")
+    public byte[] getBlockByTxId(@PathVariable(value = "txId") String txId) throws InvalidArgumentException, ProposalException {
+        return sdkService.queryBlockByTransactionId(txId);
+    }
+
+
+
+    /**
      * get blockInfo by block number.
      */
     @ApiOperation(value = "queryBlockByNumber", notes = "get block by number")

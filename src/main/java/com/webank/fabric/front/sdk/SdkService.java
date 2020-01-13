@@ -137,6 +137,18 @@ public class SdkService {
     }
 
     /**
+     * get blockInfo by transactionId.
+     */
+    public byte[] queryBlockByTransactionId(String transactionId) throws ProposalException, InvalidArgumentException {
+        Optional<BlockInfo> blockInfoOptional = Optional.ofNullable(channel.queryBlockByTransactionID(transactionId));
+        if (!blockInfoOptional.isPresent())
+            return null;
+
+        return blockInfoOptional.map(blockInfo -> blockInfo.getBlock()).map(block -> block.toByteArray()).get();
+
+    }
+
+    /**
      * get name of current channel.
      */
     public String getChannelName() {

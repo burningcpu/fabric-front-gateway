@@ -7,6 +7,8 @@ import org.apache.commons.lang3.StringUtils;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.lang.reflect.Constructor;
+import java.util.List;
 
 import static java.lang.String.format;
 
@@ -51,4 +53,16 @@ public class FrontUtils {
         return address.matches(pattern);
     }
 
+
+    public static <T> T getInstanceByReflection(Class<T> clazz, List<Object> params) {
+        try {
+            Class[] paramClazzArr = params.stream().map(p -> p.getClass()).toArray(Class[]::new);
+            Constructor<T> constructor = clazz.getDeclaredConstructor(paramClazzArr);
+            constructor.setAccessible(true);
+            return constructor.newInstance(params.toArray());
+        } catch (Exception ex) {
+            log.error("create instance by reflect exception", ex);
+        }
+        return null;
+    }
 }
