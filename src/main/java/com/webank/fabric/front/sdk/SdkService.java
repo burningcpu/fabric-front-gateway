@@ -4,7 +4,6 @@ import com.webank.fabric.front.commons.pojo.sdk.PeerVO;
 import com.webank.fabric.front.commons.utils.FrontUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.compress.utils.Lists;
-import org.apache.commons.lang3.StringUtils;
 import org.hyperledger.fabric.gateway.Network;
 import org.hyperledger.fabric.sdk.*;
 import org.hyperledger.fabric.sdk.exception.InvalidArgumentException;
@@ -14,7 +13,10 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import java.math.BigInteger;
-import java.util.*;
+import java.util.Collection;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 
 /**
  * service of fabric sdk.
@@ -66,6 +68,7 @@ public class SdkService {
      */
     public byte[] getTransactionByTxId(String txId) throws InvalidArgumentException, ProposalException {
         Optional<TransactionInfo> transactionInfoOptional = Optional.ofNullable(channel.queryTransactionByID(txId));
+
         if (!transactionInfoOptional.isPresent())
             return null;
         return transactionInfoOptional.map(trans -> trans.getProcessedTransaction().toByteArray()).get();

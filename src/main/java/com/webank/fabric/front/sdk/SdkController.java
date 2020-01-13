@@ -36,7 +36,7 @@ public class SdkController {
      * get transaction by txId.
      */
     @ApiOperation(value = "getTransactionByTxId", notes = "get transaction info by txId")
-    @GetMapping("/{txId}/transactionInfo")
+    @GetMapping("/transactionInfo/{txId}")
     public byte[] getTransactionByTxId(@PathVariable(value = "txId") String txId) throws InvalidArgumentException, ProposalException {
         return sdkService.getTransactionByTxId(txId);
     }

@@ -84,12 +84,12 @@ jar {
             into 'dist/conf'
         }
         copy {
-            from file('script/')
-            into 'dist/script'
-        }
-        copy {
             from file('crypto-config/')
             into 'dist/crypto-config'
+        }
+        copy {
+            from file('network/')
+            into 'dist/network'
         }
         copy {
             from configurations.runtime
