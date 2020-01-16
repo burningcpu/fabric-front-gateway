@@ -25,11 +25,13 @@ import java.util.Optional;
 @Service
 public class SdkService {
     private static Channel channel;
+    private static Network network;
 
     @Qualifier(value = "localNetwork")
     @Autowired
     public void setChannel(Network network) {
         Objects.requireNonNull(network, "init SdkService fail. network is null");
+        this.network = network;
         this.channel = network.getChannel();
     }
 
@@ -153,5 +155,12 @@ public class SdkService {
      */
     public String getChannelName() {
         return channel.getName();
+    }
+
+    /**
+     * get chainCodeName list.
+     */
+    public Collection<String> getDiscoveredChainCodeNames() {
+        return channel.getDiscoveredChaincodeNames();
     }
 }

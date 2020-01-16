@@ -4,7 +4,6 @@ import com.webank.fabric.front.commons.utils.FrontUtils;
 import com.webank.fabric.front.sdk.SdkService;
 import org.hyperledger.fabric.protos.common.Common;
 import org.hyperledger.fabric.sdk.BlockInfo;
-import org.hyperledger.fabric.sdk.TransactionInfo;
 import org.hyperledger.fabric.sdk.exception.InvalidArgumentException;
 import org.hyperledger.fabric.sdk.exception.ProposalException;
 import org.junit.Test;
@@ -14,15 +13,14 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.io.IOException;
-import java.lang.reflect.Constructor;
 import java.util.Arrays;
-import java.util.List;
 
 import static org.hyperledger.fabric.sdk.BlockInfo.EnvelopeType.TRANSACTION_ENVELOPE;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = Application.class)
 public class SDKServiceTest {
+
 
     @Autowired
     private SdkService sdkService;
@@ -47,7 +45,7 @@ public class SDKServiceTest {
             if (envelopeInfo.getType() == TRANSACTION_ENVELOPE) {
                 BlockInfo.TransactionEnvelopeInfo transactionEnvelopeInfo = (BlockInfo.TransactionEnvelopeInfo) envelopeInfo;
                 String txIdd = transactionEnvelopeInfo.getTransactionID();
-                System.out.println("=========txId:"+txIdd);
+                System.out.println("=========txId:" + txIdd);
 
 //                String channelId = transactionEnvelopeInfo.getChannelId();
 //                System.out.println("=========channelId:"+channelId);
@@ -59,26 +57,26 @@ public class SDKServiceTest {
 
 
                 Iterable<BlockInfo.TransactionEnvelopeInfo.TransactionActionInfo> TransactionEnvelopeInfo = ((BlockInfo.TransactionEnvelopeInfo) envelopeInfo).getTransactionActionInfos();
-                for(BlockInfo.TransactionEnvelopeInfo.TransactionActionInfo i:TransactionEnvelopeInfo){
+                for (BlockInfo.TransactionEnvelopeInfo.TransactionActionInfo i : TransactionEnvelopeInfo) {
 
-                    System.out.println("=========chainCodeIDName:"+ i.getChaincodeIDName());
-                    System.out.println("=========chainCodeIDPath:"+ i.getChaincodeIDPath());
-                    System.out.println("=========chainCodeIDVersion:"+ i.getChaincodeIDVersion());
+                    System.out.println("=========chainCodeIDName:" + i.getChaincodeIDName());
+                    System.out.println("=========chainCodeIDPath:" + i.getChaincodeIDPath());
+                    System.out.println("=========chainCodeIDVersion:" + i.getChaincodeIDVersion());
 
-                    System.out.println("=========chainCodeInputArgsCount:"+ i.getChaincodeInputArgsCount());
+                    System.out.println("=========chainCodeInputArgsCount:" + i.getChaincodeInputArgsCount());
                     StringBuffer argb = new StringBuffer();
-                    for(int m=0;m<i.getChaincodeInputArgsCount();m++){
+                    for (int m = 0; m < i.getChaincodeInputArgsCount(); m++) {
                         argb.append(" ").append(new String(i.getChaincodeInputArgs(m)));
                     }
-                    System.out.println("=========chainCodeInputArgs:"+ argb.toString());
-                    System.out.println("=========responseMessage:"+ i.getResponseMessage());
-                    System.out.println("=========responseStatus:"+ i.getResponseStatus());
+                    System.out.println("=========chainCodeInputArgs:" + argb.toString());
+                    System.out.println("=========responseMessage:" + i.getResponseMessage());
+                    System.out.println("=========responseStatus:" + i.getResponseStatus());
 
 
-                    System.out.println("=========endorsementsCount:"+ i.getEndorsementsCount());
-                    for(int m=0;m<i.getEndorsementsCount();m++){
+                    System.out.println("=========endorsementsCount:" + i.getEndorsementsCount());
+                    for (int m = 0; m < i.getEndorsementsCount(); m++) {
                         BlockInfo.EndorserInfo str = i.getEndorsementInfo(m);
-                        System.out.println("=========endorsementInfo"+m+":"+i.getEndorsementInfo(m).getId().substring(0,60));
+                        System.out.println("=========endorsementInfo" + m + ":" + i.getEndorsementInfo(m).getId().substring(0, 60));
                     }
                 }
 

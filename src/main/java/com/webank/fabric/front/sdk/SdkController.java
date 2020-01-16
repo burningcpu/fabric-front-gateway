@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigInteger;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -49,7 +50,6 @@ public class SdkController {
     public byte[] getBlockByTxId(@PathVariable(value = "txId") String txId) throws InvalidArgumentException, ProposalException {
         return sdkService.queryBlockByTransactionId(txId);
     }
-
 
 
     /**
@@ -97,5 +97,17 @@ public class SdkController {
     public String getChannelName() {
         return sdkService.getChannelName();
     }
+
+    /**
+     * get current channel.
+     *
+     * @return
+     */
+    @ApiOperation(value = "getChainCodeNameList", notes = "get chainCodeName List")
+    @GetMapping("chainCodeNameList")
+    public Collection<String> getDiscoveredChainCodeNames() {
+        return sdkService.getDiscoveredChainCodeNames();
+    }
+
 
 }
