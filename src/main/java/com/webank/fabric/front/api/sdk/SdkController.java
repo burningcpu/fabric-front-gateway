@@ -1,4 +1,4 @@
-package com.webank.fabric.front.sdk;
+package com.webank.fabric.front.api.sdk;
 
 import com.webank.fabric.front.commons.pojo.sdk.PeerVO;
 import io.swagger.annotations.Api;
