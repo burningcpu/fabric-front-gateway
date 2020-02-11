@@ -11,6 +11,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import static java.lang.String.format;
@@ -19,6 +21,8 @@ import static java.lang.String.format;
 @Slf4j
 @Component
 public class FrontUtils {
+    public static final String DEFAULT_DATE_TIME_FORMAT = "yyyy-MM-dd HH:mm:ss";
+    public static final String DATE_TIME_FORMAT_YYYYMMDD24HHMSS = "YYYYmmDD24HHMSS";
 
     /**
      * extract string from file.
@@ -74,5 +78,21 @@ public class FrontUtils {
         return null;
     }
 
+    /**
+     * convert localDateTime to String.
+     */
+    public static String localDateTime2String(LocalDateTime dateTime, String format) {
+        if (dateTime == null) {
+            log.warn("localDateTime2String. dateTime is null");
+            return null;
+        }
+        if (StringUtils.isBlank(format)) {
+            log.info("localDateTime2String. format is null");
+            format = DEFAULT_DATE_TIME_FORMAT;
+        }
+        DateTimeFormatter df = DateTimeFormatter.ofPattern(format);
+        String localTimeStr = df.format(dateTime);
+        return localTimeStr;
+    }
 
 }

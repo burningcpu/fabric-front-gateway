@@ -5,6 +5,7 @@ import com.webank.fabric.front.api.transaction.TransactionRequestInitService;
 import com.webank.fabric.front.commons.pojo.base.BaseResponse;
 import com.webank.fabric.front.commons.pojo.chaincode.ProposalResponseVO;
 import com.webank.fabric.front.commons.pojo.chaincode.ReqDeployVO;
+import com.webank.fabric.front.commons.utils.FrontUtils;
 import org.hyperledger.fabric.gateway.Contract;
 import org.hyperledger.fabric.gateway.ContractException;
 import org.hyperledger.fabric.gateway.Network;
@@ -24,6 +25,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.TimeoutException;
@@ -103,7 +105,7 @@ public class ChainCodeTest {
         reqDeployVO.setVersion("1_8");
         reqDeployVO.setInitParams(new String[]{"a", "100", "b", "200"});
         reqDeployVO.setChainCodeSource(readChainCode());
-        List<ProposalResponseVO> baseResponse = chainCodeService.deploy(reqDeployVO);
+        String baseResponse = chainCodeService.deploy(reqDeployVO);
         System.out.println(format("deploy baseResponse:%s", JSON.toJSONString(baseResponse)));
     }
 

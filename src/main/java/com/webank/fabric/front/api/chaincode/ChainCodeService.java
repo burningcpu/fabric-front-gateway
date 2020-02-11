@@ -10,6 +10,7 @@ import com.webank.fabric.front.commons.pojo.chaincode.ChainCodeInfo;
 import com.webank.fabric.front.commons.pojo.chaincode.ProposalResponseVO;
 import com.webank.fabric.front.commons.pojo.chaincode.ReqDeployVO;
 import com.webank.fabric.front.commons.utils.FileUtils;
+import com.webank.fabric.front.commons.utils.FrontUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.hyperledger.fabric.sdk.*;
 import org.hyperledger.fabric.sdk.exception.InvalidArgumentException;
@@ -21,6 +22,7 @@ import org.springframework.stereotype.Service;
 import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.EnumSet;
@@ -49,15 +51,16 @@ public class ChainCodeService {
     /**
      * deploy chainCode.
      */
-    public List<ProposalResponseVO> deploy(ReqDeployVO param) {
+    public String deploy(ReqDeployVO param) {
+        String name = param.getChainCodeName();
         String version = param.getVersion();
         String language = param.getChainCodeLang();
-        String fileName = FileUtils.buildChainCodeFileName(param.getChannelName(), param.getChainCodeName(), version, language);
-
+        String fileName = FileUtils.buildChainCodeFileName(param.getChannelName(), name, version, language);
+        String chainCodeDirectory = name + "_" + FrontUtils.localDateTime2String(LocalDateTime.now(), FrontUtils.DATE_TIME_FORMAT_YYYYMMDD24HHMSS);
         //write to file
-        writeChainCodeToFile(fileName, language, param.getChainCodeSource());
+        writeChainCodeToFile(fileName, language, param.getChainCodeSource(), chainCodeDirectory);
         //chainCodeInfo
-        ChainCodeInfo chainCodeInfo = new ChainCodeInfo(fileName, version, chainCodePath, CHAIN_CODE_RELATIVE_PATH, TransactionRequest.Type.GO_LANG, null);
+        ChainCodeInfo chainCodeInfo = new ChainCodeInfo(fileName, version, chainCodePath, chainCodeDirectory, TransactionRequest.Type.GO_LANG, null);
 
         //peers
         Collection<Peer> peers = sdkService.getPeers(EnumSet.of(Peer.PeerRole.ENDORSING_PEER));
@@ -70,15 +73,16 @@ public class ChainCodeService {
 
         //instantiate
         InstantiateProposalRequest instantiateProposalRequest = transactionRequestInitService.instantiateChainCodeReqInit(hfClient, chainCodeInfo, CHAIN_CODE_INIT_METHOD_NAME, param.getInitParams());
-        return this.instantiateChainCode(sdkService.getChannel(), peers1, instantiateProposalRequest);
+        this.instantiateChainCode(sdkService.getChannel(), peers1, instantiateProposalRequest);
+        return fileName;
     }
 
     /**
      * write chainCode to file.
      */
-    private void writeChainCodeToFile(String fileName, String language, String chainCodeSource) {
+    private void writeChainCodeToFile(String fileName, String language, String chainCodeSource, String timeStr) {
         String fileSuffix = FileUtils.chooseChainCodeFileSuffix(language);  //suffix of file
-        Path fullPathOfChainCode = Paths.get(chainCodePath, "src", CHAIN_CODE_RELATIVE_PATH, fileName + fileSuffix);
+        Path fullPathOfChainCode = Paths.get(chainCodePath, "src", timeStr, fileName + fileSuffix);
         File chainCodeFile = new File(fullPathOfChainCode.toUri());
         FileUtils.writeConstantToFile(chainCodeFile, chainCodeSource);
     }

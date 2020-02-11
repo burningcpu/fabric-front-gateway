@@ -67,20 +67,14 @@ public class SdkService {
     }
 
 
-    /**
-     * get PeerVOs by roles.
-     */
-    public Collection<PeerVO> getPeerVOs() {
-        return getPeerVOs(null);
-    }
 
     /**
      * get PeerVOs by roles.
      */
-    public Collection<PeerVO> getPeerVOs(EnumSet<Peer.PeerRole> roles) {
+    public Collection<PeerVO> getPeerVOs() {
         Collection<PeerVO> peers = Lists.newArrayList();
         //query peers
-        Optional<Collection<Peer>> peersOptional = Optional.ofNullable(channel.getPeers(roles));
+        Optional<Collection<Peer>> peersOptional = Optional.ofNullable(channel.getPeers());
 
         if (peersOptional.isPresent()) {
             //foreach peers

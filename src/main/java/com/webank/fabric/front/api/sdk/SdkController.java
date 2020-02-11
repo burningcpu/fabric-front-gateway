@@ -1,5 +1,7 @@
 package com.webank.fabric.front.api.sdk;
 
+import com.webank.fabric.front.commons.pojo.base.BaseResponse;
+import com.webank.fabric.front.commons.pojo.base.ConstantCode;
 import com.webank.fabric.front.commons.pojo.sdk.PeerVO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -25,11 +27,15 @@ public class SdkController {
 
     /**
      * get peers.
+     *
+     * @return
      */
     @ApiOperation(value = "ListPeers", notes = "get peer list")
     @GetMapping("/peers")
-    public Collection<PeerVO> ListPeers() {
-        return sdkService.getPeerVOs();
+    public BaseResponse ListPeers() {
+        Collection<PeerVO> voCollection = sdkService.getPeerVOs();
+        BaseResponse baseResponse = new BaseResponse(ConstantCode.SUCCESS, voCollection);
+        return baseResponse;
     }
 
     /**
@@ -37,8 +43,10 @@ public class SdkController {
      */
     @ApiOperation(value = "getTransactionByTxId", notes = "get transaction info by txId")
     @GetMapping("/transactionInfo/{txId}")
-    public byte[] getTransactionByTxId(@PathVariable(value = "txId") String txId) throws InvalidArgumentException, ProposalException {
-        return sdkService.getTransactionByTxId(txId);
+    public BaseResponse getTransactionByTxId(@PathVariable(value = "txId") String txId) throws InvalidArgumentException, ProposalException {
+        byte[] trans = sdkService.getTransactionByTxId(txId);
+        BaseResponse baseResponse = new BaseResponse(ConstantCode.SUCCESS, trans);
+        return baseResponse;
     }
 
     /**
@@ -46,8 +54,10 @@ public class SdkController {
      */
     @ApiOperation(value = "getBlockByTxId", notes = "get block info by txId")
     @GetMapping("/blockInfo/{txId}")
-    public byte[] getBlockByTxId(@PathVariable(value = "txId") String txId) throws InvalidArgumentException, ProposalException {
-        return sdkService.queryBlockByTransactionId(txId);
+    public BaseResponse getBlockByTxId(@PathVariable(value = "txId") String txId) throws InvalidArgumentException, ProposalException {
+        byte[] block = sdkService.queryBlockByTransactionId(txId);
+        BaseResponse baseResponse = new BaseResponse(ConstantCode.SUCCESS, block);
+        return baseResponse;
     }
 
 
@@ -56,8 +66,10 @@ public class SdkController {
      */
     @ApiOperation(value = "queryBlockByNumber", notes = "get block by number")
     @GetMapping("/queryBlockByNumber/{blockNumber}")
-    public byte[] queryBlockByNumber(@PathVariable(value = "blockNumber") Long blockNumber) throws InvalidArgumentException, ProposalException {
-        return sdkService.queryBlockByNumber(blockNumber);
+    public BaseResponse queryBlockByNumber(@PathVariable(value = "blockNumber") Long blockNumber) throws InvalidArgumentException, ProposalException {
+        byte[] block = sdkService.queryBlockByNumber(blockNumber);
+        BaseResponse baseResponse = new BaseResponse(ConstantCode.SUCCESS, block);
+        return baseResponse;
     }
 
     /**
@@ -65,8 +77,10 @@ public class SdkController {
      */
     @ApiOperation(value = "queryBlockByHash", notes = "get block by hash")
     @GetMapping("/queryBlockByHash/{blockHash}")
-    public byte[] queryBlockByHash(@PathVariable(value = "blockHash") String blockHash) throws InvalidArgumentException, ProposalException {
-        return sdkService.queryBlockByHash(blockHash);
+    public BaseResponse queryBlockByHash(@PathVariable(value = "blockHash") String blockHash) throws InvalidArgumentException, ProposalException {
+        byte[] block = sdkService.queryBlockByHash(blockHash);
+        BaseResponse baseResponse = new BaseResponse(ConstantCode.SUCCESS, block);
+        return baseResponse;
     }
 
     /**
@@ -74,8 +88,10 @@ public class SdkController {
      */
     @ApiOperation(value = "getPeerBlockNumber", notes = "get latest block height")
     @GetMapping("peerBlockNumber")
-    public BigInteger getPeerBlockNumber(@RequestParam(value = "peerUrl") String peerUrl) throws InvalidArgumentException, ProposalException {
-        return sdkService.getPeerBlockNumber(peerUrl);
+    public BaseResponse getPeerBlockNumber(@RequestParam(value = "peerUrl") String peerUrl) throws InvalidArgumentException, ProposalException {
+        BigInteger blockNumber = sdkService.getPeerBlockNumber(peerUrl);
+        BaseResponse baseResponse = new BaseResponse(ConstantCode.SUCCESS, blockNumber);
+        return baseResponse;
     }
 
     /**
@@ -83,8 +99,10 @@ public class SdkController {
      */
     @ApiOperation(value = "getChannelBlockNumber", notes = "get latest block height of channel")
     @GetMapping("channelBlockNumber")
-    public BigInteger getChannelBlockNumber() throws InvalidArgumentException, ProposalException {
-        return sdkService.getChannelBlockNumber();
+    public BaseResponse getChannelBlockNumber() throws InvalidArgumentException, ProposalException {
+        BigInteger blockNumber = sdkService.getChannelBlockNumber();
+        BaseResponse baseResponse = new BaseResponse(ConstantCode.SUCCESS, blockNumber);
+        return baseResponse;
     }
 
 
@@ -93,8 +111,10 @@ public class SdkController {
      */
     @ApiOperation(value = "getChannelName", notes = "get name of channel")
     @GetMapping("channelName")
-    public String getChannelName() {
-        return sdkService.getChannelName();
+    public BaseResponse getChannelName() {
+        String channelName = sdkService.getChannelName();
+        BaseResponse baseResponse = new BaseResponse(ConstantCode.SUCCESS, channelName);
+        return baseResponse;
     }
 
     /**
@@ -104,8 +124,10 @@ public class SdkController {
      */
     @ApiOperation(value = "getChainCodeNameList", notes = "get chainCodeName List")
     @GetMapping("chainCodeNameList")
-    public Collection<String> getDiscoveredChainCodeNames() {
-        return sdkService.getDiscoveredChainCodeNames();
+    public BaseResponse getDiscoveredChainCodeNames() {
+        Collection<String> chainCodeNames = sdkService.getDiscoveredChainCodeNames();
+        BaseResponse baseResponse = new BaseResponse(ConstantCode.SUCCESS, chainCodeNames);
+        return baseResponse;
     }
 
 

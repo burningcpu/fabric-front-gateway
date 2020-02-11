@@ -8,10 +8,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.List;
@@ -33,10 +30,10 @@ public class ChainCodeController {
      * @return
      */
     @ApiOperation(value = "deploy", notes = "deploy chainCode")
-    @GetMapping("/deploy")
+    @PostMapping("/deploy")
     public BaseResponse deployChainCode(@Valid @RequestBody ReqDeployVO param) {
-        List<ProposalResponseVO> deployRsp = chainCodeService.deploy(param);
-        BaseResponse baseResponse = new BaseResponse(ConstantCode.SUCCESS, deployRsp);
+        String chainCodeNameOnChain = chainCodeService.deploy(param);
+        BaseResponse baseResponse = new BaseResponse(ConstantCode.SUCCESS, chainCodeNameOnChain);
         return baseResponse;
     }
 }

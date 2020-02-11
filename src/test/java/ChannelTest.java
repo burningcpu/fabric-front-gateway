@@ -34,6 +34,7 @@ public class ChannelTest {
 
     @Test
     public void transactionTest() throws IOException, InterruptedException, TimeoutException, ContractException {
+        Collection<String> cns = channel.getDiscoveredChaincodeNames();
         // Obtain a smart contract deployed on the network.
         Contract contract = network.getContract("mycc");
 
