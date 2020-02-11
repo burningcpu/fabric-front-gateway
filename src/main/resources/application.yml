@@ -14,6 +14,8 @@ spring:
             privateKeyFile: "./crypto-config/peerOrganizations/org1.example.com/users/Admin@org1.example.com/msp/keystore/25de627907d35aae2c59b5ee131b4a328212437059029059a3d35a3c16722ffc_sk"
       network:
          file: "./network/connection-org1.yaml"
+   chaincode:
+      filePath: "E:/codes/fabric/fabric-front-gateway/mycc"
 
 #log config
 logging:

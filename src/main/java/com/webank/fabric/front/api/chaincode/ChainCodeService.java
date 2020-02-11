@@ -1,17 +1,34 @@
 package com.webank.fabric.front.api.chaincode;
 
+import com.alibaba.fastjson.JSON;
+import com.webank.fabric.front.api.sdk.SdkService;
+import com.webank.fabric.front.api.transaction.TransactionRequestInitService;
+import com.webank.fabric.front.commons.exception.FrontException;
+import com.webank.fabric.front.commons.pojo.base.BaseResponse;
+import com.webank.fabric.front.commons.pojo.base.ConstantCode;
+import com.webank.fabric.front.commons.pojo.chaincode.ChainCodeInfo;
+import com.webank.fabric.front.commons.pojo.chaincode.ProposalResponseVO;
+import com.webank.fabric.front.commons.pojo.chaincode.ReqDeployVO;
+import com.webank.fabric.front.commons.utils.FileUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.hyperledger.fabric.sdk.*;
-import org.hyperledger.fabric.sdk.exception.ChaincodeEndorsementPolicyParseException;
 import org.hyperledger.fabric.sdk.exception.InvalidArgumentException;
 import org.hyperledger.fabric.sdk.exception.ProposalException;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
+import java.io.File;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.EnumSet;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CountDownLatch;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 
 /**
@@ -20,40 +37,105 @@ import java.util.regex.Pattern;
 @Slf4j
 @Service
 public class ChainCodeService {
+    @Value("${spring.chaincode.filePath}")
+    private String chainCodePath;
+    @Autowired
+    private SdkService sdkService;
+    @Autowired
+    private TransactionRequestInitService transactionRequestInitService;
+    private static final String CHAIN_CODE_INIT_METHOD_NAME = "init";
+    private static final String CHAIN_CODE_RELATIVE_PATH = "cc";
 
+    /**
+     * deploy chainCode.
+     */
+    public List<ProposalResponseVO> deploy(ReqDeployVO param) {
+        String version = param.getVersion();
+        String language = param.getChainCodeLang();
+        String fileName = FileUtils.buildChainCodeFileName(param.getChannelName(), param.getChainCodeName(), version, language);
+
+        //write to file
+        writeChainCodeToFile(fileName, language, param.getChainCodeSource());
+        //chainCodeInfo
+        ChainCodeInfo chainCodeInfo = new ChainCodeInfo(fileName, version, chainCodePath, CHAIN_CODE_RELATIVE_PATH, TransactionRequest.Type.GO_LANG, null);
+
+        //peers
+        Collection<Peer> peers = sdkService.getPeers(EnumSet.of(Peer.PeerRole.ENDORSING_PEER));
+        Collection<Peer> peers1 = peers.stream().filter(peer -> peer.getName().equals("peer0.org1.example.com:7051")).collect(Collectors.toList());
+        HFClient hfClient = sdkService.getClient();
+
+        //install
+        InstallProposalRequest installProposalRequest = transactionRequestInitService.installChainCodeReqInit(hfClient, chainCodeInfo);
+        this.installChainCode(hfClient, peers1, installProposalRequest);
+
+        //instantiate
+        InstantiateProposalRequest instantiateProposalRequest = transactionRequestInitService.instantiateChainCodeReqInit(hfClient, chainCodeInfo, CHAIN_CODE_INIT_METHOD_NAME, param.getInitParams());
+        return this.instantiateChainCode(sdkService.getChannel(), peers1, instantiateProposalRequest);
+    }
+
+    /**
+     * write chainCode to file.
+     */
+    private void writeChainCodeToFile(String fileName, String language, String chainCodeSource) {
+        String fileSuffix = FileUtils.chooseChainCodeFileSuffix(language);  //suffix of file
+        Path fullPathOfChainCode = Paths.get(chainCodePath, "src", CHAIN_CODE_RELATIVE_PATH, fileName + fileSuffix);
+        File chainCodeFile = new File(fullPathOfChainCode.toUri());
+        FileUtils.writeConstantToFile(chainCodeFile, chainCodeSource);
+    }
 
     /**
      * install ChainCode.
-     **/
-    public void installChainCode(HFClient hfClient, Collection<Peer> peers, InstallProposalRequest installProposalRequest) throws InvalidArgumentException, ProposalException {
-        Collection<ProposalResponse> responses = hfClient.sendInstallProposal(installProposalRequest, peers);
-        checkProposalResponse(responses);
+     *
+     * @return
+     */
+    private List<ProposalResponseVO> installChainCode(HFClient hfClient, Collection<Peer> peers, InstallProposalRequest installProposalRequest) {
+        Collection<ProposalResponse> responses = null;
+        try {
+            responses = hfClient.sendInstallProposal(installProposalRequest, peers);
+        } catch (ProposalException | InvalidArgumentException ex) {
+            throw new FrontException(ConstantCode.INSTALL_CHAIN_CODE_EXCEPTION, ex);
+        }
+        return parsingProposalResponse(responses);
     }
 
     /**
      * instantiate ChainCode.
      **/
-    public void instantiateChainCode(Channel channel, Collection<Peer> peers, InstantiateProposalRequest instantiateProposalRequest) throws ChaincodeEndorsementPolicyParseException, IOException, InvalidArgumentException, ProposalException {
-        Collection<ProposalResponse> responses = channel.sendInstantiationProposal(instantiateProposalRequest, peers);
-        System.out.print("Sending instantiateProposalRequest to all peers with arguments");
+    private List<ProposalResponseVO> instantiateChainCode(Channel channel, Collection<Peer> peers, InstantiateProposalRequest instantiateProposalRequest) {
+        Collection<ProposalResponse> responses;
+        try {
+            responses = channel.sendInstantiationProposal(instantiateProposalRequest, peers);
+        } catch (InvalidArgumentException | ProposalException ex) {
+            throw new FrontException(ConstantCode.INSTANTIATE_CHAIN_CODE_EXCEPTION, ex);
+        }
+        log.debug("Sending instantiateProposalRequest to all peers with arguments");
         CompletableFuture<BlockEvent.TransactionEvent> cf = channel.sendTransaction(responses);
-        System.out.println("ChainCode " + instantiateProposalRequest.getChaincodeName() + " on channel " + channel.getName() + " instantiation " + cf);
-        checkProposalResponse(responses);
+        log.info("ChainCode " + instantiateProposalRequest.getChaincodeName() + " on channel " + channel.getName() + " instantiation " + cf);
+        return parsingProposalResponse(responses);
     }
 
     /**
      * invoke ChainCode.
      **/
-    public void invokeChainCode(Channel channel, TransactionProposalRequest transactionProposalRequest) throws InvalidArgumentException, ProposalException {
+    private BaseResponse invokeChainCode(Channel channel, TransactionProposalRequest transactionProposalRequest) throws InvalidArgumentException, ProposalException {
         Collection<ProposalResponse> responses = channel.sendTransactionProposal(transactionProposalRequest, channel.getPeers());
-        checkProposalResponse(responses);
+        List<ProposalResponseVO> proposalResponseList = parsingProposalResponse(responses);
+        long failCount = proposalResponseList.stream().filter(rsp -> rsp.getStatus() != ChaincodeResponse.Status.SUCCESS.getStatus()).count();
+        BaseResponse baseResponse = new BaseResponse(ConstantCode.INVOKE_CHAIN_CODE_EXCEPTION);
+        if (failCount > 0) {
+            log.error("install proposal request fail,proposalResponseList:{} ", JSON.toJSONString(proposalResponseList));
+            baseResponse.setData(proposalResponseList);
+            return baseResponse;
+        }
+
         CompletableFuture<BlockEvent.TransactionEvent> cf = channel.sendTransaction(responses);
+        return new BaseResponse(ConstantCode.SUCCESS);
     }
 
     /**
      * query ChainCode.
      **/
-    public void queryChainCode(Channel channel, QueryByChaincodeRequest queryByChaincodeRequest) throws ProposalException, InvalidArgumentException {
+    private void queryChainCode(Channel channel, QueryByChaincodeRequest queryByChaincodeRequest) throws ProposalException, InvalidArgumentException {
         Collection<ProposalResponse> response = channel.queryByChaincode(queryByChaincodeRequest);
         for (ProposalResponse pres : response) {
             String stringResponse = new String(pres.getChaincodeActionResponsePayload());
@@ -62,19 +144,38 @@ public class ChainCodeService {
     }
 
     /**
-     * check  proposal response.
+     * Parsing proposal response.
      */
-    private void checkProposalResponse(Collection<ProposalResponse> responses) {
-        for (ProposalResponse response : responses) {
-            if (response.getStatus() == ProposalResponse.Status.SUCCESS) {
-                log.info("Successful proposal response Txid:{} from peer:{}", response.getTransactionID(), response.getPeer().getName());
-            } else {
-                log.error("Failed proposal response Txid:{} from peer:{}", response.getTransactionID(), response.getPeer().getName());
-            }
+    private List<ProposalResponseVO> parsingProposalResponse(Collection<ProposalResponse> responses) {
+        StringBuffer resultMessageBf = new StringBuffer();
+        responses.stream().filter(rsp -> rsp.getStatus() != ChaincodeResponse.Status.SUCCESS).forEach(rsp -> resultMessageBf.append(rsp.getMessage()).append(";"));
+        if (resultMessageBf.length() > 0) {
+            log.error("proposal request fail,resultMessageBf:{} ", resultMessageBf.toString());
+            throw new FrontException(ConstantCode.PROPOSAL_REQUEST_EXCEPTION.getCode(), resultMessageBf.toString());
         }
+
+        List<ProposalResponseVO> responseList = new ArrayList<>(responses.size());
+        for (ProposalResponse response : responses) {
+            ProposalResponseVO rspVO;
+            try {
+                rspVO = ProposalResponseVO.builder()
+                        .chainCodeId(response.getChaincodeID().toString())
+                        .status(response.getStatus().getStatus())
+                        .txId(response.getTransactionID())
+                        .peerName(response.getPeer().getName())
+                        .message(response.getMessage())
+                        .build();
+                responseList.add(rspVO);
+            } catch (InvalidArgumentException e) {
+                log.error("parsing proposal response exception", e);
+                continue;
+            }
+
+        }
+        return responseList;
     }
 
-    public String setChainCodeEventListener(Channel channel, String expetedEventName, CountDownLatch latch) throws InvalidArgumentException {
+    private String setChainCodeEventListener(Channel channel, String expetedEventName, CountDownLatch latch) throws InvalidArgumentException {
         ChaincodeEventListener chaincodeEventListener = (s, blockEvent, chaincodeEvent) -> {
             // TODO: event������
             System.out.println(chaincodeEvent.getEventName());
@@ -87,11 +188,11 @@ public class ChainCodeService {
         return eventListenerHandle;
     }
 
-    public void upgradeChainCode(Channel channel, Collection<Peer> peers, UpgradeProposalRequest upgradeProposalRequest) throws ProposalException, InvalidArgumentException {
+    private void upgradeChainCode(Channel channel, Collection<Peer> peers, UpgradeProposalRequest upgradeProposalRequest) throws ProposalException, InvalidArgumentException {
         Collection<ProposalResponse> responses = channel.sendUpgradeProposal(upgradeProposalRequest, peers);
         CompletableFuture<BlockEvent.TransactionEvent> cf = channel.sendTransaction(responses);
         System.out.println("ChainCode " + upgradeProposalRequest.getChaincodeName() + " on channel " + channel.getName() + " instantiation " + cf);
-        checkProposalResponse(responses);
+        parsingProposalResponse(responses);
     }
 
 

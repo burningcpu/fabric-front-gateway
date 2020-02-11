@@ -1,8 +1,11 @@
 package com.webank.fabric.front.commons.utils;
 
+import com.webank.fabric.front.commons.exception.FrontException;
+import com.webank.fabric.front.commons.pojo.base.ConstantCode;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -12,9 +15,10 @@ import java.util.List;
 
 import static java.lang.String.format;
 
-@Slf4j
-public class FrontUtils {
 
+@Slf4j
+@Component
+public class FrontUtils {
 
     /**
      * extract string from file.
@@ -31,12 +35,16 @@ public class FrontUtils {
         File file = new File(path);
         String fullPathname = file.getAbsolutePath();
         if (!file.exists()) {
-            throw new RuntimeException(format("file %s does not exist", fullPathname));
+            String errorMsg = format("file %s does not exist", fullPathname);
+            log.error(errorMsg);
+            throw new FrontException(ConstantCode.SYSTEM_EXCEPTION.getCode(), errorMsg);
         }
         try (FileInputStream stream = new FileInputStream(file)) {
             pemString = IOUtils.toString(stream, "UTF-8");
         } catch (IOException ioe) {
-            throw new RuntimeException(format("Failed to read file: %s", fullPathname), ioe);
+            String errorMsg = format("Failed to read file: %s", fullPathname);
+            log.error(errorMsg);
+            throw new FrontException(ConstantCode.SYSTEM_EXCEPTION.getCode(), errorMsg, ioe);
         }
 
         return pemString;
@@ -65,4 +73,6 @@ public class FrontUtils {
         }
         return null;
     }
+
+
 }

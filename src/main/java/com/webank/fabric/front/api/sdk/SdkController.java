@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.math.BigInteger;
 import java.util.Collection;
-import java.util.List;
 
 /**
  * controller of fabric sdk.
@@ -29,8 +28,8 @@ public class SdkController {
      */
     @ApiOperation(value = "ListPeers", notes = "get peer list")
     @GetMapping("/peers")
-    public List<PeerVO> ListPeers() {
-        return sdkService.getPeers();
+    public Collection<PeerVO> ListPeers() {
+        return sdkService.getPeerVOs();
     }
 
     /**

@@ -1,6 +1,9 @@
 package com.webank.fabric.front.api.transaction;
 
+import com.webank.fabric.front.commons.exception.FrontException;
+import com.webank.fabric.front.commons.pojo.base.ConstantCode;
 import com.webank.fabric.front.commons.pojo.chaincode.ChainCodeInfo;
+import lombok.extern.slf4j.Slf4j;
 import org.hyperledger.fabric.sdk.*;
 import org.hyperledger.fabric.sdk.exception.ChaincodeEndorsementPolicyParseException;
 import org.hyperledger.fabric.sdk.exception.InvalidArgumentException;
@@ -17,19 +20,25 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 /**
  * methods for get object of proposalRequest.
  */
+@Slf4j
 @Service
 public class TransactionRequestInitService {
 
     /**
      * method for get InstallProposalRequest.
      */
-    public InstallProposalRequest installChainCodeReqInit(HFClient hfClient, ChainCodeInfo chaincodeInfo) throws InvalidArgumentException {
+    public InstallProposalRequest installChainCodeReqInit(HFClient hfClient, ChainCodeInfo chaincodeInfo) {
         InstallProposalRequest installProposalRequest = hfClient.newInstallProposalRequest();
         ChaincodeID chaincodeID = chaincodeInfo.getChaincodeID();
         installProposalRequest.setChaincodeID(chaincodeID);
-        installProposalRequest.setChaincodeSourceLocation(Paths.get(chaincodeInfo.getFilePath()).toFile());
+        try {
+            installProposalRequest.setChaincodeSourceLocation(Paths.get(chaincodeInfo.getFilePath()).toFile());
+        } catch (InvalidArgumentException ex) {
+            log.error("installChainCodeReqInit fail", ex);
+            throw new FrontException(ConstantCode.OPERATION_EXCEPTION, ex);
+        }
         installProposalRequest.setChaincodeVersion(chaincodeID.getVersion());
-       // installProposalRequest.setChaincodePath(chaincodeInfo.getPath());
+        // installProposalRequest.setChaincodePath(chaincodeInfo.getPath());
         installProposalRequest.setChaincodeLanguage(chaincodeInfo.getLanguage());
 
         return installProposalRequest;
@@ -38,7 +47,7 @@ public class TransactionRequestInitService {
     /**
      * method for get InstantiateProposalRequest.
      */
-    public InstantiateProposalRequest instantiateChainCodeReqInit(HFClient hfClient, ChainCodeInfo chaincodeInfo, String functionName, String[] argv) throws InvalidArgumentException, IOException, ChaincodeEndorsementPolicyParseException {
+    public InstantiateProposalRequest instantiateChainCodeReqInit(HFClient hfClient, ChainCodeInfo chaincodeInfo, String functionName, String[] argv) {
         InstantiateProposalRequest instantiateProposalRequest = hfClient.newInstantiationProposalRequest();
         ChaincodeID chaincodeID = chaincodeInfo.getChaincodeID();
         instantiateProposalRequest.setProposalWaitTime(180000);
@@ -50,13 +59,18 @@ public class TransactionRequestInitService {
         Map<String, byte[]> tm = new HashMap<>();
         tm.put("HyperLedgerFabric", "InstantiateProposalRequest:JavaSDK".getBytes(UTF_8));
         tm.put("method", "InstantiateProposalRequest".getBytes(UTF_8));
-        instantiateProposalRequest.setTransientMap(tm);
+        try {
+            instantiateProposalRequest.setTransientMap(tm);
 
-        String policyPath = chaincodeInfo.getChaincodePolicyPath();
-        if (policyPath != null) {
-            ChaincodeEndorsementPolicy chaincodeEndorsementPolicy = new ChaincodeEndorsementPolicy();
-            chaincodeEndorsementPolicy.fromYamlFile(new File(policyPath));
-            instantiateProposalRequest.setChaincodeEndorsementPolicy(chaincodeEndorsementPolicy);
+            String policyPath = chaincodeInfo.getChaincodePolicyPath();
+            if (policyPath != null) {
+                ChaincodeEndorsementPolicy chaincodeEndorsementPolicy = new ChaincodeEndorsementPolicy();
+                chaincodeEndorsementPolicy.fromYamlFile(new File(policyPath));
+                instantiateProposalRequest.setChaincodeEndorsementPolicy(chaincodeEndorsementPolicy);
+            }
+        } catch (InvalidArgumentException | IOException | ChaincodeEndorsementPolicyParseException ex) {
+            log.error("instantiateChainCodeReqInit fail", ex);
+            throw new FrontException(ConstantCode.OPERATION_EXCEPTION, ex);
         }
         return instantiateProposalRequest;
     }
@@ -64,7 +78,7 @@ public class TransactionRequestInitService {
     /**
      * method for get UpgradeProposalRequest.
      */
-    public UpgradeProposalRequest upgradeChainCodeReqInit(HFClient hfClient, ChainCodeInfo chaincodeInfo, String functionName, String[] argv) throws InvalidArgumentException, IOException, ChaincodeEndorsementPolicyParseException {
+    public UpgradeProposalRequest upgradeChainCodeReqInit(HFClient hfClient, ChainCodeInfo chaincodeInfo, String functionName, String[] argv) {
         UpgradeProposalRequest proposalRequest = hfClient.newUpgradeProposalRequest();
         ChaincodeID chaincodeID = chaincodeInfo.getChaincodeID();
         proposalRequest.setProposalWaitTime(180000);
@@ -76,22 +90,27 @@ public class TransactionRequestInitService {
         Map<String, byte[]> tm = new HashMap<>();
         tm.put("HyperLedgerFabric", "UpgradeProposalRequest:JavaSDK".getBytes(UTF_8));
         tm.put("method", "UpgradeProposalRequest".getBytes(UTF_8));
-        proposalRequest.setTransientMap(tm);
+        try {
+            proposalRequest.setTransientMap(tm);
 
-        String policyPath = chaincodeInfo.getChaincodePolicyPath();
-        if (policyPath != null) {
-            ChaincodeEndorsementPolicy chaincodeEndorsementPolicy = new ChaincodeEndorsementPolicy();
-            chaincodeEndorsementPolicy.fromYamlFile(new File(policyPath));
-            proposalRequest.setChaincodeEndorsementPolicy(chaincodeEndorsementPolicy);
+            String policyPath = chaincodeInfo.getChaincodePolicyPath();
+            if (policyPath != null) {
+                ChaincodeEndorsementPolicy chaincodeEndorsementPolicy = new ChaincodeEndorsementPolicy();
+                chaincodeEndorsementPolicy.fromYamlFile(new File(policyPath));
+                proposalRequest.setChaincodeEndorsementPolicy(chaincodeEndorsementPolicy);
+            }
+        } catch (InvalidArgumentException | IOException | ChaincodeEndorsementPolicyParseException ex) {
+            log.error("upgradeChainCodeReqInit fail", ex);
+            throw new FrontException(ConstantCode.OPERATION_EXCEPTION, ex);
         }
         return proposalRequest;
     }
 
     /**
-     * method for get TransactionProposalRequest.
+     * method for get invokeChainCodeReqInit.
      */
-    public TransactionProposalRequest invodeChainCodeReqInit(HFClient hfClient,
-                                                             ChainCodeInfo chaincodeInfo, String functionName, String[] argv) throws InvalidArgumentException {
+    public TransactionProposalRequest invokeChainCodeReqInit(HFClient hfClient,
+                                                             ChainCodeInfo chaincodeInfo, String functionName, String[] argv) {
         TransactionProposalRequest transactionProposalRequest = hfClient.newTransactionProposalRequest();
         ChaincodeID chaincodeID = chaincodeInfo.getChaincodeID();
         transactionProposalRequest.setChaincodeID(chaincodeID);
@@ -103,12 +122,16 @@ public class TransactionRequestInitService {
         tm2.put("HyperLedgerFabric", "TransactionProposalRequest:JavaSDK".getBytes(UTF_8)); //Just some extra junk in transient map
         tm2.put("method", "TransactionProposalRequest".getBytes(UTF_8)); // ditto
         tm2.put("result", ":)".getBytes(UTF_8));  // This should be returned in the payload see chaincode why.
-        transactionProposalRequest.setTransientMap(tm2);
+        try {
+            transactionProposalRequest.setTransientMap(tm2);
+        } catch (InvalidArgumentException ex) {
+            log.error("invokeChainCodeReqInit fail", ex);
+        }
         return transactionProposalRequest;
     }
 
     /**
-     * method for get QueryByChaincodeRequest.
+     * method for get queryByChainCodeRequest.
      */
     public QueryByChaincodeRequest queryChainCodeReqInit(HFClient hfClient, ChaincodeID chaincodeID,
                                                          String functionName, String[] argv) {

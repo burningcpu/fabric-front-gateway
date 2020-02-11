@@ -5,6 +5,7 @@ import com.webank.fabric.front.commons.utils.FrontUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.compress.utils.Lists;
 import org.hyperledger.fabric.gateway.Network;
+import org.hyperledger.fabric.gateway.impl.GatewayImpl;
 import org.hyperledger.fabric.sdk.*;
 import org.hyperledger.fabric.sdk.exception.InvalidArgumentException;
 import org.hyperledger.fabric.sdk.exception.ProposalException;
@@ -14,7 +15,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigInteger;
 import java.util.Collection;
-import java.util.List;
+import java.util.EnumSet;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -37,12 +38,50 @@ public class SdkService {
     }
 
     /**
+     * get channel.
+     */
+    public Channel getChannel() {
+        return channel;
+    }
+
+    /**
+     * get HfClient.
+     */
+    public HFClient getClient() {
+        GatewayImpl gateway = (GatewayImpl) network.getGateway();
+        return gateway.getClient();
+    }
+
+    /**
      * get peers.
      */
-    public List<PeerVO> getPeers() {
-        List<PeerVO> peers = Lists.newArrayList();
+    public Collection<Peer> getPeers() {
+        return channel.getPeers();
+    }
+
+    /**
+     * get peers by roles.
+     */
+    public Collection<Peer> getPeers(EnumSet<Peer.PeerRole> roles) {
+        return channel.getPeers(roles);
+    }
+
+
+    /**
+     * get PeerVOs by roles.
+     */
+    public Collection<PeerVO> getPeerVOs() {
+        return getPeerVOs(null);
+    }
+
+    /**
+     * get PeerVOs by roles.
+     */
+    public Collection<PeerVO> getPeerVOs(EnumSet<Peer.PeerRole> roles) {
+        Collection<PeerVO> peers = Lists.newArrayList();
         //query peers
-        Optional<Collection<Peer>> peersOptional = Optional.ofNullable(channel.getPeers());
+        Optional<Collection<Peer>> peersOptional = Optional.ofNullable(channel.getPeers(roles));
+
         if (peersOptional.isPresent()) {
             //foreach peers
             peersOptional.get().stream().forEach(p -> peers.add(createPeerVO(p)));
