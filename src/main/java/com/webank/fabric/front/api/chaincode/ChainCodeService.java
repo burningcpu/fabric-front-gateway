@@ -10,7 +10,6 @@ import com.webank.fabric.front.commons.pojo.chaincode.ChainCodeInfo;
 import com.webank.fabric.front.commons.pojo.chaincode.ProposalResponseVO;
 import com.webank.fabric.front.commons.pojo.chaincode.ReqDeployVO;
 import com.webank.fabric.front.commons.utils.FileUtils;
-import com.webank.fabric.front.commons.utils.FrontUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.hyperledger.fabric.sdk.*;
 import org.hyperledger.fabric.sdk.exception.InvalidArgumentException;
@@ -20,13 +19,11 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.EnumSet;
-import java.util.List;
+import java.time.Instant;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CountDownLatch;
 import java.util.regex.Pattern;
@@ -46,7 +43,7 @@ public class ChainCodeService {
     @Autowired
     private TransactionRequestInitService transactionRequestInitService;
     private static final String CHAIN_CODE_INIT_METHOD_NAME = "init";
-    private static final String CHAIN_CODE_RELATIVE_PATH = "cc";
+    final Base64.Decoder decoder = Base64.getDecoder();
 
     /**
      * deploy chainCode.
@@ -55,10 +52,11 @@ public class ChainCodeService {
         String name = param.getChainCodeName();
         String version = param.getVersion();
         String language = param.getChainCodeLang();
-        String fileName = FileUtils.buildChainCodeFileName(param.getChannelName(), name, version, language);
-        String chainCodeDirectory = name + "_" + FrontUtils.localDateTime2String(LocalDateTime.now(), FrontUtils.DATE_TIME_FORMAT_YYYYMMDD24HHMSS);
+        String chainCodeSource = new String(decoder.decode(param.getChainCodeSourceBase64()), StandardCharsets.UTF_8);//
+        String fileName = FileUtils.buildChainCodeFileName(param.getChannelName(), name, version);
+        String chainCodeDirectory = name + "_" + Instant.now().toEpochMilli();
         //write to file
-        writeChainCodeToFile(fileName, language, param.getChainCodeSource(), chainCodeDirectory);
+        writeChainCodeToFile(fileName, language, chainCodeSource, chainCodeDirectory);
         //chainCodeInfo
         ChainCodeInfo chainCodeInfo = new ChainCodeInfo(fileName, version, chainCodePath, chainCodeDirectory, TransactionRequest.Type.GO_LANG, null);
 
@@ -74,6 +72,7 @@ public class ChainCodeService {
         //instantiate
         InstantiateProposalRequest instantiateProposalRequest = transactionRequestInitService.instantiateChainCodeReqInit(hfClient, chainCodeInfo, CHAIN_CODE_INIT_METHOD_NAME, param.getInitParams());
         this.instantiateChainCode(sdkService.getChannel(), peers1, instantiateProposalRequest);
+
         return fileName;
     }
 

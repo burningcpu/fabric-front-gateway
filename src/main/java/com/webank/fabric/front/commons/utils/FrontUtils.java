@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Base64;
 import java.util.List;
 
 import static java.lang.String.format;
@@ -22,13 +23,14 @@ import static java.lang.String.format;
 @Component
 public class FrontUtils {
     public static final String DEFAULT_DATE_TIME_FORMAT = "yyyy-MM-dd HH:mm:ss";
-    public static final String DATE_TIME_FORMAT_YYYYMMDD24HHMSS = "YYYYmmDD24HHMSS";
+    public static final String DATE_TIME_FORMAT_YYYYMMDD24MISS = "YYYYmmDD24miss";
+
+    final Base64.Decoder decoder = Base64.getDecoder();
 
     /**
      * extract string from file.
      */
     public static String extractFileString(String path) {
-
         String pemString = null;
 
         if (StringUtils.isBlank(path)) {

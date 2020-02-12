@@ -5,7 +5,6 @@ import com.webank.fabric.front.commons.pojo.base.ConstantCode;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.hyperledger.fabric.sdk.TransactionRequest;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
@@ -75,19 +74,14 @@ public class FileUtils {
     /**
      * build name of chainCodeFile.
      */
-    public static String buildChainCodeFileName(String channelName, String chainCodeName, String version, String chainCodeLang) {
+    public static String buildChainCodeFileName(String channelName, String chainCodeName, String version) {
         if (StringUtils.isAnyBlank(channelName, chainCodeName, version)) {
             String errorMsg = "buildChainCodeFileName fail:channelName、chainCodeName、version or constant is null";
             log.error(errorMsg);
             throw new FrontException(ConstantCode.OPERATION_EXCEPTION.getCode(), errorMsg);
         }
 
-        if (StringUtils.isBlank(chainCodeLang)) {
-            log.info("chainCodeLang is null,use default:{}", TransactionRequest.Type.GO_LANG.toString());
-            chainCodeLang = TransactionRequest.Type.GO_LANG.toString();
-        }
-
-        String fileName = channelName + "_" + chainCodeLang + "_" + chainCodeName + "_" + version;
+        String fileName = channelName + "_" + chainCodeName + "_" + version;
         return fileName;
     }
 

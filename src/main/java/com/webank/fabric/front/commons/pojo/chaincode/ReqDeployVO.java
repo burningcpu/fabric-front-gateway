@@ -17,7 +17,7 @@ public class ReqDeployVO {
     @NotEmpty
     private String chainCodeName;
     @NotEmpty
-    private String chainCodeSource;
+    private String chainCodeSourceBase64;
     @NotEmpty
     private String version;
     private String chainCodeLang = TransactionRequest.Type.GO_LANG.toString();

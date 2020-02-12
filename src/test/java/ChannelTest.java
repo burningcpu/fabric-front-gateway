@@ -1,5 +1,6 @@
 import com.alibaba.fastjson.JSON;
 import com.webank.fabric.front.Application;
+import com.webank.fabric.front.commons.utils.FrontUtils;
 import org.hyperledger.fabric.gateway.Contract;
 import org.hyperledger.fabric.gateway.ContractException;
 import org.hyperledger.fabric.gateway.Network;
@@ -13,6 +14,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Objects;
 import java.util.concurrent.TimeoutException;
@@ -34,6 +36,8 @@ public class ChannelTest {
 
     @Test
     public void transactionTest() throws IOException, InterruptedException, TimeoutException, ContractException {
+        String chainCodeDirectory = "name" + "_" + FrontUtils.localDateTime2String(LocalDateTime.now(), FrontUtils.DATE_TIME_FORMAT_YYYYMMDD24MISS);
+
         Collection<String> cns = channel.getDiscoveredChaincodeNames();
         // Obtain a smart contract deployed on the network.
         Contract contract = network.getContract("mycc");
