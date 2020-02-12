@@ -39,6 +39,7 @@ public class ConstantCode {
     public static final RetCode INVOKE_CHAIN_CODE_EXCEPTION = RetCode.mark(205002, "invoke chainCode failed");
     public static final RetCode INSTANTIATE_CHAIN_CODE_EXCEPTION = RetCode.mark(205003, "instantiate chainCode exception");
     public static final RetCode PROPOSAL_REQUEST_EXCEPTION = RetCode.mark(205004, "proposal request exception");
+    public static final RetCode TRANSACTION_EXCEPTION = RetCode.mark(205005, "send transaction exception");
 
 
     /* param exception */
