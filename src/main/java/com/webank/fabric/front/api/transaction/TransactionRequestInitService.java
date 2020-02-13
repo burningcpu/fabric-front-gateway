@@ -32,13 +32,13 @@ public class TransactionRequestInitService {
         ChaincodeID chaincodeID = chaincodeInfo.getChaincodeID();
         installProposalRequest.setChaincodeID(chaincodeID);
         try {
-            installProposalRequest.setChaincodeSourceLocation(Paths.get(chaincodeInfo.getFilePath()).toFile());
+            installProposalRequest.setChaincodeSourceLocation(Paths.get(chaincodeInfo.getSourceLocation()).toFile());
         } catch (InvalidArgumentException ex) {
             log.error("installChainCodeReqInit fail", ex);
             throw new FrontException(ConstantCode.OPERATION_EXCEPTION, ex);
         }
         installProposalRequest.setChaincodeVersion(chaincodeID.getVersion());
-        // installProposalRequest.setChaincodePath(chaincodeInfo.getPath());
+        installProposalRequest.setChaincodePath(chaincodeInfo.getChaincodePath());
         installProposalRequest.setChaincodeLanguage(chaincodeInfo.getLanguage());
 
         return installProposalRequest;

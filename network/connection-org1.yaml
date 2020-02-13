@@ -22,7 +22,7 @@ organizations:
 
 peers:
   peer0.org1.example.com:
-    url: grpcs://134.175.106.84:7051
+    url: grpcs://peer0.org1.example.com:7051
     tlsCACerts:
       pem: |
         -----BEGIN CERTIFICATE-----
@@ -45,7 +45,7 @@ peers:
       ssl-target-name-override: peer0.org1.example.com
       hostnameOverride: peer0.org1.example.com
   peer1.org1.example.com:
-    url: grpcs://134.175.106.84:8051
+    url: grpcs://peer1.org1.example.com:8051
     tlsCACerts:
       pem: |
         -----BEGIN CERTIFICATE-----
@@ -69,7 +69,7 @@ peers:
       hostnameOverride: peer1.org1.example.com
 certificateAuthorities:
   ca.org1.example.com:
-    url: https://134.175.106.84:7054
+    url: https://ca.org1.example.com:7054
     caName: ca-org1
     tlsCACerts:
       pem: |

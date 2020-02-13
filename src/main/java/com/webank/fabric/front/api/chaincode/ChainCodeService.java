@@ -37,7 +37,9 @@ import java.util.stream.Collectors;
 @Service
 public class ChainCodeService {
     @Value("${spring.chaincode.filePath}")
-    private String chainCodePath;
+    private String sourceLocation;
+    @Value("${spring.fabric.organization.mspid}")
+    private String mspId;
     @Autowired
     private SdkService sdkService;
     @Autowired
@@ -54,24 +56,24 @@ public class ChainCodeService {
         String language = param.getChainCodeLang();
         String chainCodeSource = new String(decoder.decode(param.getChainCodeSourceBase64()), StandardCharsets.UTF_8);//
         String fileName = FileUtils.buildChainCodeFileName(param.getChannelName(), name, version);
-        String chainCodeDirectory = name + "_" + Instant.now().toEpochMilli();
+        String chainCodePath = name + "_" + Instant.now().toEpochMilli();
         //write to file
-        writeChainCodeToFile(fileName, language, chainCodeSource, chainCodeDirectory);
-        //chainCodeInfo
-        ChainCodeInfo chainCodeInfo = new ChainCodeInfo(fileName, version, chainCodePath, chainCodeDirectory, TransactionRequest.Type.GO_LANG, null);
+        writeChainCodeToFile(fileName, language, chainCodeSource, chainCodePath);
+        //chainCodeInfo 要确保 sourceLocation子目录下为/src/chaincodePath，chaincodePath子目录包含链码，即整体的目录为 sourceLocation/src/chaincodePath/链码.go
+        ChainCodeInfo chainCodeInfo = new ChainCodeInfo(fileName, version, sourceLocation, chainCodePath, TransactionRequest.Type.GO_LANG, null);
 
         //peers
         Collection<Peer> peers = sdkService.getPeers(EnumSet.of(Peer.PeerRole.ENDORSING_PEER));
-        Collection<Peer> peers1 = peers.stream().filter(peer -> peer.getName().equals("peer0.org1.example.com:7051")).collect(Collectors.toList());
+        Collection<Peer> peersOfOrg = peers.stream().filter(peer -> peer.getProperties().getProperty("org.hyperledger.fabric.sdk.peer.organization_mspid").equals(mspId)).collect(Collectors.toList());
         HFClient hfClient = sdkService.getClient();
 
         //install
         InstallProposalRequest installProposalRequest = transactionRequestInitService.installChainCodeReqInit(hfClient, chainCodeInfo);
-        this.installChainCode(hfClient, peers1, installProposalRequest);
+        this.installChainCode(hfClient, peersOfOrg, installProposalRequest);
 
         //instantiate
         InstantiateProposalRequest instantiateProposalRequest = transactionRequestInitService.instantiateChainCodeReqInit(hfClient, chainCodeInfo, CHAIN_CODE_INIT_METHOD_NAME, param.getInitParams());
-        this.instantiateChainCode(sdkService.getChannel(), peers1, instantiateProposalRequest);
+        this.instantiateChainCode(sdkService.getChannel(), peersOfOrg, instantiateProposalRequest);
 
         return fileName;
     }
@@ -81,7 +83,7 @@ public class ChainCodeService {
      */
     private void writeChainCodeToFile(String fileName, String language, String chainCodeSource, String timeStr) {
         String fileSuffix = FileUtils.chooseChainCodeFileSuffix(language);  //suffix of file
-        Path fullPathOfChainCode = Paths.get(chainCodePath, "src", timeStr, fileName + fileSuffix);
+        Path fullPathOfChainCode = Paths.get(sourceLocation, "src", timeStr, fileName + fileSuffix);
         File chainCodeFile = new File(fullPathOfChainCode.toUri());
         FileUtils.writeConstantToFile(chainCodeFile, chainCodeSource);
     }
@@ -92,6 +94,7 @@ public class ChainCodeService {
      * @return
      */
     private List<ProposalResponseVO> installChainCode(HFClient hfClient, Collection<Peer> peers, InstallProposalRequest installProposalRequest) {
+
         Collection<ProposalResponse> responses = null;
         try {
             responses = hfClient.sendInstallProposal(installProposalRequest, peers);
@@ -105,6 +108,7 @@ public class ChainCodeService {
      * instantiate ChainCode.
      **/
     private List<ProposalResponseVO> instantiateChainCode(Channel channel, Collection<Peer> peers, InstantiateProposalRequest instantiateProposalRequest) {
+        log.info("==============================channelName:{}", channel.getName());
         Collection<ProposalResponse> responses;
         try {
             responses = channel.sendInstantiationProposal(instantiateProposalRequest, peers);

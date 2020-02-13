@@ -34,7 +34,6 @@ public class SdkService {
         Objects.requireNonNull(network, "init SdkService fail. network is null");
         this.network = network;
         this.channel = network.getChannel();
-
     }
 
     /**

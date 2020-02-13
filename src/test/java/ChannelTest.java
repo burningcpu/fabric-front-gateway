@@ -36,9 +36,8 @@ public class ChannelTest {
 
     @Test
     public void transactionTest() throws IOException, InterruptedException, TimeoutException, ContractException {
-        String chainCodeDirectory = "name" + "_" + FrontUtils.localDateTime2String(LocalDateTime.now(), FrontUtils.DATE_TIME_FORMAT_YYYYMMDD24MISS);
 
-        Collection<String> cns = channel.getDiscoveredChaincodeNames();
+        String msp = network.getGateway().getIdentity().getMspId();
         // Obtain a smart contract deployed on the network.
         Contract contract = network.getContract("mycc");
 

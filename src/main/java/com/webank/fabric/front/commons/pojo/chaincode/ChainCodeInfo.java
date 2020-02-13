@@ -8,17 +8,17 @@ import org.hyperledger.fabric.sdk.TransactionRequest;
 public class ChainCodeInfo {
     private final String name;
     private final String version;
-    private final String filePath;
-    private final String path;
+    private final String sourceLocation;
+    private final String chaincodePath;
     private final TransactionRequest.Type language;
     private final String chaincodePolicyPath;
     private final ChaincodeID chaincodeID;
 
-    public ChainCodeInfo(String name, String version, String filePath, String path, TransactionRequest.Type language, String chaincodePolicyPath) {
+    public ChainCodeInfo(String name, String version, String sourceLocation, String chainCodePath, TransactionRequest.Type language, String chaincodePolicyPath) {
         this.name = name;
         this.version = version;
-        this.filePath = filePath;
-        this.path = path;
+        this.sourceLocation = sourceLocation;
+        this.chaincodePath = chainCodePath;
         this.language = language;
         this.chaincodeID = chainCodeInit();
         this.chaincodePolicyPath = chaincodePolicyPath;
@@ -27,8 +27,8 @@ public class ChainCodeInfo {
     private ChaincodeID chainCodeInit() {
         ChaincodeID.Builder chaincodeIDBuilder = ChaincodeID.newBuilder().setName(this.name)
                 .setVersion(this.version);
-        if (null != this.path) {
-            chaincodeIDBuilder.setPath(this.path);
+        if (null != this.chaincodePath) {
+            chaincodeIDBuilder.setPath(this.chaincodePath);
 
         }
         return chaincodeIDBuilder.build();

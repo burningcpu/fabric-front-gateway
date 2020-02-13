@@ -4,6 +4,8 @@ import com.webank.fabric.front.commons.utils.FrontUtils;
 import com.webank.fabric.front.api.sdk.SdkService;
 import org.hyperledger.fabric.protos.common.Common;
 import org.hyperledger.fabric.sdk.BlockInfo;
+import org.hyperledger.fabric.sdk.Channel;
+import org.hyperledger.fabric.sdk.HFClient;
 import org.hyperledger.fabric.sdk.exception.InvalidArgumentException;
 import org.hyperledger.fabric.sdk.exception.ProposalException;
 import org.junit.Test;
@@ -28,6 +30,8 @@ public class SDKServiceTest {
 
     @Test
     public void queryBlockByNumberTest() throws InvalidArgumentException, ProposalException, IOException {
+        HFClient hfClient = sdkService.getClient();
+
         byte[] blockString = sdkService.queryBlockByNumber(2L);
         Common.Block block = Common.Block.parseFrom(blockString);
         BlockInfo blockInfo1 = FrontUtils.getInstanceByReflection(BlockInfo.class, Arrays.asList(block));

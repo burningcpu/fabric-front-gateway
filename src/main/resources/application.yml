@@ -6,6 +6,8 @@ server:
 
 spring:
    fabric:
+      organization:
+         mspid: "Org1MSP"
       channel: mychannel
       gateway:
          wallet:
