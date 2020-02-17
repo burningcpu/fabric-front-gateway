@@ -30,6 +30,11 @@ public class BaseResponse {
     public BaseResponse() {
     }
 
+    public BaseResponse(int code, String message) {
+        this.code = code;
+        this.message = message;
+    }
+
     public BaseResponse(RetCode retcode) {
         this.code = retcode.getCode();
         this.message = retcode.getMessage();

@@ -1,6 +1,6 @@
 package com.webank.fabric.front;
 
-import com.webank.fabric.front.commons.config.FabricProperties;
+import com.webank.fabric.front.commons.pojo.properties.FabricProperties;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;

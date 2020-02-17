@@ -1,4 +1,4 @@
-package com.webank.fabric.front.commons.config;
+package com.webank.fabric.front.commons.pojo.properties;
 
 import com.webank.fabric.front.commons.pojo.properties.GatewayProperties;
 import com.webank.fabric.front.commons.pojo.properties.NetworkProperties;

@@ -1,26 +1,63 @@
 #server config
 server:
-   port: 8081
-   servlet:
-      context-path: /Fabric-Front
+  port: 8081
+  servlet:
+    context-path: /Fabric-Front
 
 spring:
-   fabric:
-      organization:
-         mspid: "Org1MSP"
-      channel: mychannel
-      gateway:
-         wallet:
-            identify: "Admin"
-            certFile: "./crypto-config/peerOrganizations/org1.example.com/users/Admin@org1.example.com/msp/signcerts/Admin@org1.example.com-cert.pem"
-            privateKeyFile: "./crypto-config/peerOrganizations/org1.example.com/users/Admin@org1.example.com/msp/keystore/25de627907d35aae2c59b5ee131b4a328212437059029059a3d35a3c16722ffc_sk"
-      network:
-         file: "./network/connection-org1.yaml"
-   chaincode:
-      filePath: "E:/codes/fabric/fabric-front-gateway/mycc"
+  #fabric
+  fabric:
+    organization:
+      mspid: "Org1MSP"
+    channel: mychannel
+    gateway:
+      wallet:
+        identify: "Admin"
+        certFile: "./crypto-config/peerOrganizations/org1.example.com/users/Admin@org1.example.com/msp/signcerts/Admin@org1.example.com-cert.pem"
+        privateKeyFile: "./crypto-config/peerOrganizations/org1.example.com/users/Admin@org1.example.com/msp/keystore/25de627907d35aae2c59b5ee131b4a328212437059029059a3d35a3c16722ffc_sk"
+    network:
+      file: "./network/connection-org1.yaml"
+  chaincode:
+    filePath: "E:/codes/fabric/fabric-front-gateway/mycc"
+
+  #h2 dataSource
+  datasource:
+    url: jdbc:h2:file:./h2/fabricFront;DB_CLOSE_ON_EXIT=FALSE
+    databaseName: db
+    driverClassName: org.h2.Driver
+    serverName:
+    username:
+    password:
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    database: H2
+    openInView: false
+    show_sql: false
+    generate-ddl: true
+    hibernate:
+      ddl-auto: update
+      naming-strategy: org.hibernate.cfg.EJB3NamingStrategy
+      session:
+        events:
+          log: false
+    properties:
+      hibernate.cache.use_query_cache: false
+      hibernate.generate_statistics: false
+  h2:
+    console:
+      enabled: true
+      path: /console
+      settings:
+        web-allow-others: false
+        trace: true
+
 
 #log config
 logging:
-   config: classpath:log4j2.xml
-   level:
-      com.webank.fabric.front: debug
+  config: classpath:log4j2.xml
+  level:
+    com.webank.fabric.front: debug
+#constants
+constant:
+  monitorDisk: /
+  monitorEnabled: true

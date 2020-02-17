@@ -121,7 +121,7 @@ public class ChainCodeTest {
 
         // Obtain a smart contract deployed on the network.
        // Contract contract = network.getContract("myhello::chaincode::v1.0");//.getContract("mycc");
-        Contract contract = network.getContract("mychannel_heihei_1_3");//.getContract("mycc");
+        Contract contract = network.getContract("mychannel_mh_1");//.getContract("mycc");
 
         // Evaluate transactions that query state from the ledger.
         byte[] queryResult = contract.createTransaction("query")
