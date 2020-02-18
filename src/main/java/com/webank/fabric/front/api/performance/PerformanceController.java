@@ -65,7 +65,7 @@ public class PerformanceController {
             @ApiImplicitParam(name = "contrastEndDate", value = "compare end time"),
             @ApiImplicitParam(name = "gap", value = "time gap", dataType = "int")})
     @GetMapping
-    public List<PerformanceData> getPerformanceRatio(
+    public BaseResponse getPerformanceRatio(
             @RequestParam(required = false) @DateTimeFormat(
                     iso = DATE_TIME) LocalDateTime beginDate,
             @RequestParam(required = false) @DateTimeFormat(iso = DATE_TIME) LocalDateTime endDate,
@@ -76,32 +76,39 @@ public class PerformanceController {
             @RequestParam(required = false, defaultValue = "1") int gap) throws Exception {
         List<PerformanceData> performanceList = performanceService.findContrastDataByTime(beginDate,
                 endDate, contrastBeginDate, contrastEndDate, gap);
-        return performanceList;
+        BaseResponse baseResponse = new BaseResponse(ConstantCode.SUCCESS, performanceList);
+        return baseResponse;
     }
 
     @ApiOperation(value = "获取性能配置信息", notes = "获取性能配置信息")
     @GetMapping(value = "/config")
-    public Map<String, String> getPerformanceConfig() throws SigarException, UnknownHostException {
-        return performanceService.getConfigInfo();
+    public BaseResponse getPerformanceConfig() throws SigarException, UnknownHostException {
+        Map<String, String> result = performanceService.getConfigInfo();
+        BaseResponse baseResponse = new BaseResponse(ConstantCode.SUCCESS, result);
+        return baseResponse;
     }
 
     @ApiOperation(value = "获取同步任务开关状态", notes = "获取同步任务开关状态")
     @GetMapping(value = "/toggle")
-    public Object getScheduledStatus() throws Exception {
+    public BaseResponse getScheduledStatus() throws Exception {
         // on is true, off is false
         Boolean onOrOff = performanceService.getToggleStatus();
         String status = onOrOff ? "ON" : "OFF";
-        return new BaseResponse(0, "Sync Status is " + status + ",onOrOff is" + onOrOff);
+        Object result = new BaseResponse(0, "Sync Status is " + status + ",onOrOff is" + onOrOff);
+        BaseResponse baseResponse = new BaseResponse(ConstantCode.SUCCESS, result);
+        return baseResponse;
     }
 
     @ApiOperation(value = "切换定时同步任务开关", notes = "切换定时同步任务开关")
     @PostMapping(value = "/toggle")
-    public Object toggleScheduledState(@RequestBody ToggleHandle toggleHandle) throws Exception {
+    public BaseResponse toggleScheduledState(@RequestBody ToggleHandle toggleHandle) throws Exception {
         boolean toggle = toggleHandle.isEnable();
         try {// on is true, off is false
             boolean onOrOff = performanceService.toggleSync(toggle);
             String status = onOrOff ? "ON" : "OFF";
-            return new BaseResponse(0, "Sync Status is " + status + ",onOrOff is" + onOrOff);
+            Object result = new BaseResponse(0, "Sync Status is " + status + ",onOrOff is" + onOrOff);
+            BaseResponse baseResponse = new BaseResponse(ConstantCode.SUCCESS, result);
+            return baseResponse;
         } catch (FrontException ex) {
             return new BaseResponse(ConstantCode.SYSTEM_EXCEPTION, ex);
         }
