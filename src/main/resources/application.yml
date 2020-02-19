@@ -18,7 +18,7 @@ spring:
     network:
       file: "./network/connection-org1.yaml"
   chaincode:
-    filePath: "E:/codes/fabric/fabric-front-gateway/mycc"
+    filePath: "./mycc"
 
   #h2 dataSource
   datasource:
