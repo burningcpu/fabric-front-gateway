@@ -64,7 +64,21 @@ chmod +x ./gradlew && ./gradlew build -x test
           file: "./network/connection-org1.yaml"
   ```
 
-### 3.4. 服务启停
+
+### 3.4. 配置host
+由于fabric证书是颁发给节点域名的，sdk也是通过域名访问节点，所以需要配置host关联节点的ip
+* centos服务器：vi /etc/hosts
+* window host路径：C:\Windows\System32\drivers\etc
+* host内容范例：
+```
+127.0.0.1   peer0.org1.example.com
+127.0.0.1   peer1.org1.example.com
+127.0.0.1   peer0.org2.example.com
+127.0.0.1   peer1.org2.example.com
+127.0.0.1   orderer.example.com
+```
+
+### 3.5. 服务启停
 
 返回到dist目录执行：
 ```shell
@@ -79,7 +93,7 @@ chmod +x ./gradlew && ./gradlew build -x test
 	Application() - main run success...
 ```
 
-### 3.5. 访问swagger页面
+### 3.6. 访问swagger页面
 
 ```
 http://{deployIP}:{frontPort}/Fabric-Front/swagger-ui.html
@@ -89,7 +103,7 @@ http://{deployIP}:{frontPort}/Fabric-Front/swagger-ui.html
 - 部署服务器IP和服务端口需对应修改，网络策略需开通
 
 
-### 3.6. 查看日志
+### 3.7. 查看日志
 
 在dist目录查看：
 
