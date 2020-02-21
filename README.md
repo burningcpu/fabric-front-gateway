@@ -15,7 +15,7 @@ fabric-front-gateway使用fabric-gateway-java接入fabric链，提供接口管�
 ### 3.1. 拉取代码
 
 ```
-git clone https://github.com/dwusiq/fabric-front-gateway.git
+git clone https://github.com/burningcpu/fabric-front-gateway.git
 ```
 
 进入目录：
